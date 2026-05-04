@@ -1,0 +1,5 @@
+1. App sends pdf
+2. Pdf direced to Parser class 
+3. Hit Gemini Api with front page with the table
+4. get_Header_JSON_List
+5. Return the Response JSON  
