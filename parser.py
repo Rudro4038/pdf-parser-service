@@ -33,6 +33,10 @@ def transform_pdf_rows(rows: List[List[str]]) -> List[Dict[str, Any]]:
         
         # Join multi-row headers with a space (e.g., "Attendance" + "(Out of 20)")
         final_header[col_idx] = " ".join(col_parts).strip()
+    
+    print("Final Collapsed Header:", final_header)  # Debugging log
+    for raf_i in range(1,7):
+        print (rows[raf_i])
 
     # 3. Process Data Rows
     transformed_data = []
@@ -52,3 +56,13 @@ def transform_pdf_rows(rows: List[List[str]]) -> List[Dict[str, Any]]:
             transformed_data.append(obj)
 
     return transformed_data
+
+
+
+[
+    "সিরিয়াল নং",
+    "রেজিস্ট্রেশন নং",
+    "Attendence (20)",
+    "Total (10)",
+    "Evaluation (5)",
+]

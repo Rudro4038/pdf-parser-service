@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import pdfplumber
 from parser import transform_pdf_rows
+from summariser import summarize
 
 app = FastAPI()
 
@@ -37,6 +38,22 @@ async def parse_pdf(file: UploadFile = File(...)):
             "success": True,
             "count": len(data),
             "data": data
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@app.post("/summarize")
+async def summarize_endpoint(file: UploadFile = File(...)):
+    try:
+        response = summarize(file.file.read().decode('utf-8'))
+        print("Summarization response:", response)  # Debugging log
+        return {
+            "success": True,
+            "summary": response
         }
 
     except Exception as e:
