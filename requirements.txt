@@ -1,6 +1,9 @@
-fastapi
-uvicorn
+fastapi[standard]
+uvicorn[standard]
 pdfplumber
 python-multipart
+google-genai
+python-dotenv
+Pillow
 transformers
 torch

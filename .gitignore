@@ -1,4 +1,41 @@
-venv/
-raf/
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
 
-*.env
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Packaging and build output
+build/
+dist/
+*.egg-info/
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checker and linter caches
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# Editor and OS files
+.DS_Store
+.idea/
+
+# Runtime/temp files
+*.log
+raf/
+tmp/
+temp/
