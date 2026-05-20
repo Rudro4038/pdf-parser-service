@@ -17,6 +17,8 @@ class Parser:
 
     def parse(self) -> List[Dict[str, Any]]:
         try:
+            all_rows = self.extract_all_rows()
+
             # Get the first page as an image
             first_page_img = self.get_the_first_image_from_the_PDF()
             if first_page_img:
@@ -29,17 +31,18 @@ class Parser:
 
             try:
                 # header list in JSON format
-                header_json_list = get_header_JSON_List(img_path)
-                header_json_list = json.loads(header_json_list)
-                print("Header JSON List from Gemini:", header_json_list)
+                header_list_text_from_gemini = get_header_JSON_List(img_path)
             finally:
                 os.remove(img_path) # Clean up the temporary image file
 
-            all_rows = self.extract_all_rows()
+            header_list_from_gemini = json.loads(header_list_text_from_gemini)
+            first_student_row = self.get_first_student_row(all_rows)
 
+            header_json_list = self.combine_header_and_first_row(header_list_from_gemini, first_student_row)
+            
             response = {
                 "header_json_list": header_json_list,
-                "all_rows": all_rows
+                "raw_data": all_rows
             }
             return response
         finally:
@@ -84,4 +87,27 @@ class Parser:
         
         finally:
             os.remove(self.tmp_path)
-    
+        
+
+    def get_first_student_row(self, all_rows: List[List[str]]) -> List[str]:
+        ans = []
+        for row in all_rows:
+            flag = 0
+            for cell in row:
+                if cell and re.search(r'2022337', str(cell)):  # check not None
+                    flag = 1
+            if flag == 1:
+                ans = row
+                break
+        return ans
+
+    def combine_header_and_first_row(self, header_list_from_gemini: List[str], first_student_row: List[str]) -> List[Dict[str, str]]:
+        header_json_list = []
+        for i in range(len(first_student_row)):
+            header_json_list.append({
+                "id" : i+1,
+                "header": header_list_from_gemini[i] if i < len(header_list_from_gemini) else "", 
+                "attribute": first_student_row[i],
+                "isTaken" : True
+            })
+        return header_json_list

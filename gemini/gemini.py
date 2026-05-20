@@ -28,15 +28,17 @@ def get_header_JSON_List(img_path: str) -> str:
     
     client = genai.Client(api_key=api_key)
 
-    # Generate content using the image and the prompt
-    response = client.models.generate_content(
-        model="gemini-3-flash-preview",
-        contents=[prompt, img],
-        config=types.GenerateContentConfig(
-            # Use JSON mode to ensure the format is strictly followed
-            response_mime_type="application/json"
+    try:
+        # Generate content using the image and the prompt
+        response = client.models.generate_content(
+            model="gemini-3-flash-preview",
+            contents=[prompt, img],
+            config=types.GenerateContentConfig(
+                # Use JSON mode to ensure the format is strictly followed
+                response_mime_type="application/json"
+            )
         )
-    )
-
-    return response.text
+        return response.text
+    except Exception:
+        return "[]"
     # return "[\"SL1. No.\", \"Registration no.\", \"Term test (10)\", \"\", \"Attendance (18)\"]"
