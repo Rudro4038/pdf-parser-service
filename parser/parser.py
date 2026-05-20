@@ -29,6 +29,7 @@ class Parser:
             else:
                 return {"error": "Could not extract image from PDF"}
 
+            # Header List generation 
             try:
                 # header list in JSON format
                 header_list_text_from_gemini = get_header_JSON_List(img_path)
@@ -37,12 +38,14 @@ class Parser:
 
             header_list_from_gemini = json.loads(header_list_text_from_gemini)
             first_student_row = self.get_first_student_row(all_rows)
-
             header_json_list = self.combine_header_and_first_row(header_list_from_gemini, first_student_row)
-            
+
+            # raw data generation
+            raw_data = self.extract_all_rows_student(all_rows, first_student_row)
+
             response = {
                 "header_json_list": header_json_list,
-                "raw_data": all_rows
+                "raw_data": raw_data
             }
             return response
         finally:
@@ -58,6 +61,10 @@ class Parser:
                 tables = page.extract_tables()
                 for table in tables:
                     all_rows.extend(table)
+        for row in all_rows:
+            for i in range(len(row)):
+                if row[i] is None:
+                    row[i] = ""
         return all_rows 
 
 
@@ -107,7 +114,32 @@ class Parser:
             header_json_list.append({
                 "id" : i+1,
                 "header": header_list_from_gemini[i] if i < len(header_list_from_gemini) else "", 
-                "attribute": first_student_row[i],
+                "attribute": first_student_row[i] if first_student_row[i] is not None else "",
                 "isTaken" : True
             })
         return header_json_list
+    
+    def extract_all_rows_student(self, all_rows: List[List[str]], first_student_row: List[str]) -> List[Dict[str, str]]:
+        raw_data = []
+        for row in all_rows:
+            id_present_flag = 0
+            for cell in row:
+                if cell and re.search(r'337', str(cell)):  # check not None
+                    id_present_flag = 1
+                    break
+                else:
+                    id_present_flag = 0
+
+            if len(row) != len(first_student_row) or id_present_flag == 0:
+                continue
+
+            print(row)
+
+            student_data = []
+            for i in range(len(row)):
+                student_data.append({
+                    "id": i+1,
+                    "value": row[i] 
+                })
+            raw_data.append(student_data)
+        return raw_data
